@@ -22,29 +22,198 @@
  * Contribuciones:
  *
  * Dario Correal - Version inicial
- """
-
-
-import config as cf
+"""
+import math
+from DISClib.DataStructures.arraylist import getElement
 from DISClib.ADT import list as lt
 from DISClib.ADT import map as mp
 from DISClib.DataStructures import mapentry as me
-from DISClib.Algorithms.Sorting import shellsort as sa
+from DISClib.Algorithms.Sorting import mergesort as sa
+import config as cf
 assert cf
 
-"""
-Se define la estructura de un catálogo de videos. El catálogo tendrá dos listas, una para los videos, otra para las categorias de
-los mismos.
-"""
 
-# Construccion de modelos
 
+def newCatalogA():
+    """
+    Inicializa el catálogo de libros. Crea una lista vacia para guardar
+    todos los libros, adicionalmente, crea una lista vacia para los autores,
+    una lista vacia para los generos y una lista vacia para la asociación
+    generos y libros. Retorna el catalogo inicializado.
+    """
+    catalog = {'Artists': None,
+               'Artworks': None,
+               'Mediums':None}
+
+    catalog['Artists'] = lt.newList('ARRAY_LIST', cmpfunction = compareArtistID)
+    catalog['Artworks'] = lt.newList('ARRAY_LIST', cmpfunction =  compareObjectID)
+
+    catalog['Mediums'] = mp.newMap(1000,
+                                   maptype='PROBING',
+                                   loadfactor=0.5,
+                                   comparefunction=compareMapMediums)
+
+    return catalog
 # Funciones para agregar informacion al catalogo
 
-# Funciones para creacion de datos
+def addArtists(catalog, artist):
+    # Se adiciona el libro a la lista de libros
+    lt.addLast(catalog['Artists'], artist)
+    # Se obtienen los autores del libro
+    # ID = artist['Constituent ID']
 
-# Funciones de consulta
 
-# Funciones utilizadas para comparar elementos dentro de una lista
+def addArtworks(catalog, artwork):
+    # Se adiciona el libro a la lista de libros
 
-# Funciones de ordenamiento
+    if artwork["Date"] == "":
+        artwork["Date"] = "999999"
+
+    obra = {
+        'ObjectID':artwork['ObjectID'],
+        'ConstituentID':artwork['ConstituentID'],
+        'Title':artwork['Title'],
+        'Medium':artwork['Medium'],
+        'Dimensions':artwork['Dimensions'],
+        'CreditLine':artwork['CreditLine'],
+        'DateAcquired':artwork['DateAcquired'],
+        'Department':artwork['Department'],
+        'URL':artwork['URL'],
+        'Height (cm)':artwork['Height (cm)'],
+        'Length (cm)':artwork['Length (cm)'],
+        'Weight (kg)':artwork['Weight (kg)'],
+        'Width (cm)':artwork['Width (cm)'],
+        'Classification':artwork['Classification'],
+        'Depth (cm)':artwork['Depth (cm)'],
+        'Diameter (cm)':artwork['Diameter (cm)'],
+        'Date':artwork['Date']
+
+    }
+    lt.addLast(catalog['Artworks'], obra)
+    addMedium(catalog,obra)
+
+def addMedium(catalog, obra):
+    """
+    Esta funcion adiciona un libro a la lista de libros que
+    fueron publicados en un año especifico.
+    Los años se guardan en un Map, donde la llave es el año
+    y el valor la lista de libros de ese año.
+    """
+    try:
+        mediums = catalog['Mediums']
+        if (obra['Medium'] != ''):
+            pubmedium = obra['Medium']
+        else:
+            pubmedium = "None"
+        existyear = mp.contains(mediums, pubmedium)
+        if existyear:
+            entry = mp.get(mediums,pubmedium)
+            medium = me.getValue(entry)
+        else:
+            medium = newMedium(pubmedium)
+            mp.put(mediums, pubmedium, medium)
+        lt.addLast(medium['obras'],obra)
+        sa.sort(medium['obras'], cmpdate)
+    except Exception:
+        return None
+
+
+def newMedium(pubmedium):
+    """
+    Esta funcion crea la estructura de libros asociados
+    a un año.
+    """
+    entry = {'medio': "", "obras": None}
+    entry['medio'] = pubmedium
+    entry['obras'] = lt.newList('ARRAY_LIST')
+    return entry
+
+def funcionReqUno(catalog, medium):
+    """
+    Retorna un autor con sus libros a partir del nombre del autor
+    """
+    medio = mp.get(catalog['Mediums'], medium)
+    if medio:
+        return me.getValue(medio)
+    return None
+
+
+def cmpFunctionRuno(anouno, anodos):
+    return (int(anouno["BeginDate"]) < int(anodos["BeginDate"]))
+
+def cmpobjectid(iduno, iddos):
+    return (int(iduno["ObjectID"]) < int(iddos["ObjectID"]))
+
+def cmpFunctionIndice(artist1, artist2):
+    return (int(artist1["ConstituentID"]) < int(artist2["ConstituentID"]))
+
+def cmpcount(countuno, countdos):
+    return (int(countuno["Count"])> int(countdos["Count"]))
+
+def cmpFunctionRdos(feuno, fedos):
+    fechauno= feuno["DateAcquired"]
+    fechados = fedos["DateAcquired"]
+    if (fechauno!=None) and (fechauno!=""):
+        mini= fechauno[0:4]+fechauno[5:7]+fechauno[8:10]
+        mini= int(mini)
+    else:
+        mini=0
+    if (fechados!=None) and (fechados!=""):
+        maxi= fechados[0:4]+fechados[5:7]+fechados[8:10]
+        maxi= int(maxi)
+    else:
+        maxi=0
+    return (int(mini) < int(maxi))
+
+
+def cmpnationality(nat1, nat2):
+    return nat1["Nationality"] < nat2["Nationality"]
+
+def cmpsize(obras1, obras2):
+    return int(lt.size(obras1["obras"])) > int(lt.size(obras2["obras"]))
+
+def compareObjectID(artwork1, artwor2):
+    if (artwork1["ObjectID"] == artwor2['ObjectID']):
+        return 0
+    elif (artwork1["ObjectID"] > artwor2['ObjectID']):
+        return 1
+    return -1
+
+def compareArtistID(artwork1, artwor2):
+    if (artwork1["ConstituentID"] == artwor2['ConstituentID']):
+        return 0
+    elif (artwork1["ConstituentID"] > artwor2['ConstituentID']):
+        return 1
+    return -1
+
+def cmpIDArtistas(artista1, artista2):
+    return int(artista1["ConstituentID"]) < int(artista2["ConstituentID"])
+
+def cmpunique(obra1, obra2):
+    return int(obra1["ObjectID"])<int(obra2["ObjectID"])
+
+def cmpdept(deptuno,deptdos):
+    return (deptuno["Department"]<deptdos["Department"])
+
+def cmpdate(dateuno, datedos):
+    return (int(dateuno['Date'])<int(datedos['Date']))
+
+def cmpcost(costuno, costdos):
+    return (float(costuno['TransCost (USD)'])>float(costdos['TransCost (USD)']))
+
+    #===========================================
+    #EL COMPARE FUNCTION PARA EL MAP NUEVO
+    #===========================================
+
+def compareMapMediums(med, entry):
+    """
+    Compara DOS MEDIUMS, med es un identificador
+    y entry una pareja llave-valor
+    """
+    medentry = me.getKey(entry)
+    if (med == medentry):
+        return 0
+    elif (med > medentry):
+        return 1
+    else:
+        return -1

@@ -24,9 +24,15 @@ import config as cf
 import sys
 import controller
 from DISClib.ADT import list as lt
+from DISClib.ADT import map as mp
+from DISClib.DataStructures import mapentry as me
 assert cf
-
-
+from DISClib.Algorithms.Sorting import mergesort as sa
+from time import process_time
+from prettytable import PrettyTable, ALL
+import sys 
+default_limit = 1000 
+sys.setrecursionlimit(default_limit*10)
 """
 La vista se encarga de la interacción con el usuario
 Presenta el menu de opciones y por cada seleccion
@@ -37,9 +43,66 @@ operación solicitada
 def printMenu():
     print("Bienvenido")
     print("1- Cargar información en el catálogo")
-    print("2- ")
+    print("2- Las N obras mas antiguas del medio")
+    print("3- SALIR")
 
-catalog = None
+
+def initCatalogA():
+    """
+    Inicializa el catalogo de libros
+    """
+    return controller.initCatalogA()
+
+
+def loadData(catalog):
+    """
+    Carga los libros en la estructura de datos
+    """
+    controller.loadData(catalog)
+
+def funcionReqUno(catalog, medium,eln):
+    ordenad= controller.funcionReqUno(catalog,medium)
+    ordenado = ordenad["obras"]
+    el_n= int(eln)
+    tamanio = lt.size(ordenado)
+    print("============= Req No. 1 Inputs =============")
+    print("Artworks of the medium " + str(medium) + "\n")
+    print("============= Req No. 1 Answer =============")
+    print("There are " + str(tamanio) + " artworks of the medium " + str(medium)  + "\n")
+    print("The n works are")
+    if ordenado==None:
+        print("No hay info")
+    elif tamanio<el_n:
+        x = PrettyTable()
+        x.field_names = (["ObjectID","Title", "Medium", "Dimensions","Date",
+                      "DateAcquired", "URL"])
+        x.max_width = 25
+        x.hrules=ALL
+
+        for i in range(1, tamanio+1):
+            artwork = lt.getElement(ordenado, i)
+            
+            x.add_row([artwork["ObjectID"], artwork["Title"],
+                    artwork["Medium"], artwork["Dimensions"],artwork["Date"], artwork["DateAcquired"], 
+                    artwork["URL"]])
+        print(x)
+
+    else:
+        x = PrettyTable()
+        x.field_names = (["ObjectID","Title", "Medium", "Dimensions","Date",
+                      "DateAcquired", "URL"])
+        x.max_width = 25
+        x.hrules=ALL
+
+        for i in range(1, el_n):
+            artwork = lt.getElement(ordenado, i)
+            
+            x.add_row([artwork["ObjectID"], artwork["Title"], 
+                    artwork["Medium"], artwork["Dimensions"], artwork["Date"],artwork["DateAcquired"], 
+                    artwork["URL"]])
+
+        print(x)
+
 
 """
 Menu principal
@@ -48,11 +111,25 @@ while True:
     printMenu()
     inputs = input('Seleccione una opción para continuar\n')
     if int(inputs[0]) == 1:
-        print("Cargando información de los archivos ....")
-
+        catalog = initCatalogA()
+        t1 = process_time()
+        loadData(catalog)
+        t2 = process_time()
+        print("Cargando información de los archivos ....\n")
+        
+        print('Artistas cargados: ' + str(lt.size(catalog['Artists'])) + "\n")
+        print('Obras cargadas: ' + str(lt.size(catalog['Artworks']))+"\n")
+        print("Time = " + str(t2 - t1) + "seg \n")
+    
     elif int(inputs[0]) == 2:
-        pass
+        medio=input("Coloque el medio:\n")
+        eln=input("Cuantas obras quiere ver:\n")
+        t1 = process_time()
+        funcionReqUno(catalog, medio, eln)
+        t2 = process_time()
+        print("Time = " + str(t2 - t1) + "seg \n")
 
+  
     else:
         sys.exit(0)
 sys.exit(0)
