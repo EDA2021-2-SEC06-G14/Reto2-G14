@@ -59,6 +59,7 @@ def loadArtists(catalog):
     input_file = csv.DictReader(open(artistsfile, encoding='utf-8'))
     for artist in input_file:
         model.addArtists(catalog, artist)
+        model.addArtistConstituent(catalog, artist)
 
 
 def loadArtworks(catalog):
@@ -73,3 +74,6 @@ def loadArtworks(catalog):
 
 def funcionReqUno(catalog,medium):
     return model.funcionReqUno(catalog,medium)
+
+def ReqLab6(catalog, nacionalidad):
+    return model.ReqLab6(catalog, nacionalidad)

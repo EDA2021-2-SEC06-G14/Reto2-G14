@@ -44,7 +44,8 @@ def printMenu():
     print("Bienvenido")
     print("1- Cargar información en el catálogo")
     print("2- Las N obras mas antiguas del medio")
-    print("3- SALIR")
+    print("3- Numero de obras de una nacionalidad")
+    print("4- SALIR")
 
 
 def initCatalogA():
@@ -65,9 +66,9 @@ def funcionReqUno(catalog, medium,eln):
     ordenado = ordenad["obras"]
     el_n= int(eln)
     tamanio = lt.size(ordenado)
-    print("============= Req No. 1 Inputs =============")
+    print("============= Req Lab. 5 Inputs =============")
     print("Artworks of the medium " + str(medium) + "\n")
-    print("============= Req No. 1 Answer =============")
+    print("============= Req Lab. 5 Answer =============")
     print("There are " + str(tamanio) + " artworks of the medium " + str(medium)  + "\n")
     print("The n works are")
     if ordenado==None:
@@ -104,6 +105,14 @@ def funcionReqUno(catalog, medium,eln):
         print(x)
 
 
+def ReqLab6(catalog, nacionalidad):
+    size = controller.ReqLab6(catalog, nacionalidad)
+    print("============= Req Lab. 6 Inputs =============")
+    print("Artworks of the nationality " + nacionalidad + "\n")
+    print("============= Req Lab. 6 Answer =============")
+    print("There are " + str(size) + " artworks of the nationality " + nacionalidad  + "\n")
+
+
 """
 Menu principal
 """
@@ -129,7 +138,13 @@ while True:
         t2 = process_time()
         print("Time = " + str(t2 - t1) + "seg \n")
 
-  
+    elif int(inputs[0]) == 3:
+        nacionalidad = input("Ingrese la nacionalidad: \n")
+        t1 = process_time()
+        size = ReqLab6(catalog, nacionalidad)
+        t1 = process_time()
+        print("Time = " + str(t2 - t1) + "seg \n")
+
     else:
         sys.exit(0)
 sys.exit(0)

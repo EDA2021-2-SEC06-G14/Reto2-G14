@@ -43,15 +43,25 @@ def newCatalogA():
     """
     catalog = {'Artists': None,
                'Artworks': None,
-               'Mediums':None}
+               'Mediums':None,
+               'ArtistConstituent': None,
+               'Nationality': None}
 
     catalog['Artists'] = lt.newList('ARRAY_LIST', cmpfunction = compareArtistID)
     catalog['Artworks'] = lt.newList('ARRAY_LIST', cmpfunction =  compareObjectID)
 
     catalog['Mediums'] = mp.newMap(1000,
-                                   maptype='PROBING',
-                                   loadfactor=0.5,
+                                   maptype='CHAINING',
+                                   loadfactor=4.0,
                                    comparefunction=compareMapMediums)
+
+    catalog['ArtistConstituent'] =  mp.newMap(2000,
+                                              maptype = "CHAINING",
+                                              loadfactor = 4.0)
+
+    catalog['Nationality'] = mp.newMap(1000,
+                                       maptype='CHAINING',
+                                       loadfactor = 4.0)
 
     return catalog
 # Funciones para agregar informacion al catalogo
@@ -91,6 +101,7 @@ def addArtworks(catalog, artwork):
     }
     lt.addLast(catalog['Artworks'], obra)
     addMedium(catalog,obra)
+    addNationality(catalog, obra)
 
 def addMedium(catalog, obra):
     """
@@ -128,6 +139,35 @@ def newMedium(pubmedium):
     entry['obras'] = lt.newList('ARRAY_LIST')
     return entry
 
+def addArtistConstituent(catalog, artist):
+
+    artistas = catalog['ArtistConstituent']    
+    arti = mp.put(artistas, artist["ConstituentID"], artist)
+
+def addNationality(catalog, obra):
+
+    nationality = catalog['Nationality']
+
+    artistas = obra["ConstituentID"].strip("[]").replace(" ", "").split(",")
+
+    for i in artistas:
+        nat = mp.get(catalog["ArtistConstituent"], i)
+        nat = me.getValue(nat)
+        nat = nat["Nationality"]
+
+        if nat.lower() in (None, "", "unknown", "nationality unknown"):
+            nat = "Unknown"
+
+        existe = mp.contains(nationality, nat)
+        if existe:
+            nal = mp.get(nationality, nat)
+            na = me.getValue(nal)
+        else:
+            na = lt.newList("ARRAY_LIST")
+            mp.put(nationality, nat, na)
+
+        lt.addLast(na, obra)
+
 def funcionReqUno(catalog, medium):
     """
     Retorna un autor con sus libros a partir del nombre del autor
@@ -137,6 +177,14 @@ def funcionReqUno(catalog, medium):
         return me.getValue(medio)
     return None
 
+def ReqLab6(catalog, nacionalidad):
+    nationalities = catalog["Nationality"]
+
+    try:
+        nationality = me.getValue(mp.get(nationalities, nacionalidad))
+        return lt.size(nationality)
+    except Exception:
+        print("No se encotrno ninguna obra de esa nacionalidad")
 
 def cmpFunctionRuno(anouno, anodos):
     return (int(anouno["BeginDate"]) < int(anodos["BeginDate"]))
