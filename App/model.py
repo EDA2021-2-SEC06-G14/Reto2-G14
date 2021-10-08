@@ -63,6 +63,8 @@ def newCatalogA():
                                        maptype='CHAINING',
                                        loadfactor = 4.0)
 
+    catalog['yearsborn'] = mp.newMap(1000,maptype='CHAINING',loadfactor = 4.0)
+
     return catalog
 # Funciones para agregar informacion al catalogo
 
@@ -112,7 +114,7 @@ def addMedium(catalog, obra):
     """
     try:
         mediums = catalog['Mediums']
-        if (obra['Medium'] != ''):
+        if (obra['Medium'] != '') and (obra['Medium'] != None):
             pubmedium = obra['Medium']
         else:
             pubmedium = "None"
@@ -168,6 +170,42 @@ def addNationality(catalog, obra):
 
         lt.addLast(na, obra)
 
+def addArtistBorn(catalog, artist):
+    """
+    Esta funcion adiciona un libro a la lista de libros que
+    fueron publicados en un año especifico.
+    Los años se guardan en un Map, donde la llave es el año
+    y el valor la lista de libros de ese año.
+    """
+    try:
+        years = catalog['yearsborn']
+        if (artist['BeginDate'] != ''):
+            bornyear = artist['BeginDate']
+            bornyear = int(float(bornyear))
+        else:
+            bornyear = 99999
+        existyear = mp.contains(years, bornyear)
+        if existyear:
+            entry = mp.get(years, bornyear)
+            year = me.getValue(entry)
+        else:
+            year = newYear(bornyear)
+            mp.put(years, bornyear, year)
+        lt.addLast(year['artists'], artist)
+    except Exception:
+        return None
+
+
+def newYear(bornyear):
+    """
+    Esta funcion crea la estructura de libros asociados
+    a un año.
+    """
+    entry = {'year': "", "artists": None}
+    entry['year'] = bornyear
+    entry['artists'] = lt.newList('ARRAY_LIST')
+    return entry
+
 def funcionReqUno(catalog, medium):
     """
     Retorna un autor con sus libros a partir del nombre del autor
@@ -185,6 +223,22 @@ def ReqLab6(catalog, nacionalidad):
         return lt.size(nationality)
     except Exception:
         print("No se encotrno ninguna obra de esa nacionalidad")
+
+
+def funcionReqUnoReto(catalog, inicial, final):
+    ini = int(float(inicial))
+    fin = int(float(final))
+    tad_rta = lt.newList("ARRAY_LIST")
+    for i in range(ini,fin+1):
+        anio = mp.get(catalog['yearsborn'], i)
+        if anio:
+            artistas = me.getValue(anio)
+            a_pasar=artistas["artists"]
+            for x in range(1, lt.size(a_pasar)+1):
+                elem= lt.getElement(a_pasar,x)
+                lt.addLast(tad_rta, elem)
+    return tad_rta
+
 
 def cmpFunctionRuno(anouno, anodos):
     return (int(anouno["BeginDate"]) < int(anodos["BeginDate"]))

@@ -60,6 +60,7 @@ def loadArtists(catalog):
     for artist in input_file:
         model.addArtists(catalog, artist)
         model.addArtistConstituent(catalog, artist)
+        model.addArtistBorn(catalog, artist)
 
 
 def loadArtworks(catalog):
@@ -74,6 +75,9 @@ def loadArtworks(catalog):
 
 def funcionReqUno(catalog,medium):
     return model.funcionReqUno(catalog,medium)
+
+def funcionReqUnoReto(catalog, inicial, final):
+    return model.funcionReqUnoReto(catalog, inicial, final)
 
 def ReqLab6(catalog, nacionalidad):
     return model.ReqLab6(catalog, nacionalidad)
