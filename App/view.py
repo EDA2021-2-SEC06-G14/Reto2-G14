@@ -153,9 +153,11 @@ while True:
         loadData(catalog)
         t2 = process_time()
         print("Cargando información de los archivos ....\n")
-        
+        #Nationality
         print('Artistas cargados: ' + str(lt.size(catalog['Artists'])) + "\n")
         print('Obras cargadas: ' + str(lt.size(catalog['Artworks']))+"\n")
+        print('Medios cargados: ' + str(mp.size(catalog['Mediums']))+"\n")
+        print('Nacionalidades cargadas: ' + str(mp.size(catalog['Nationality']))+"\n")
         print("Time = " + str(t2 - t1) + "seg \n")
     
     elif int(inputs[0]) == 2:

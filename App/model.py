@@ -50,20 +50,20 @@ def newCatalogA():
     catalog['Artists'] = lt.newList('ARRAY_LIST', cmpfunction = compareArtistID)
     catalog['Artworks'] = lt.newList('ARRAY_LIST', cmpfunction =  compareObjectID)
 
-    catalog['Mediums'] = mp.newMap(1000,
-                                   maptype='CHAINING',
-                                   loadfactor=4.0,
+    catalog['Mediums'] = mp.newMap(100000,
+                                   maptype='PROBING',
+                                   loadfactor=0.5,
                                    comparefunction=compareMapMediums)
 
-    catalog['ArtistConstituent'] =  mp.newMap(2000,
-                                              maptype = "CHAINING",
-                                              loadfactor = 4.0)
+    catalog['ArtistConstituent'] =  mp.newMap(200000,
+                                              maptype = "PROBING",
+                                              loadfactor = 0.5)
 
-    catalog['Nationality'] = mp.newMap(1000,
-                                       maptype='CHAINING',
-                                       loadfactor = 4.0)
+    catalog['Nationality'] = mp.newMap(100000,
+                                       maptype='PROBING',
+                                       loadfactor = 0.5)
 
-    catalog['yearsborn'] = mp.newMap(1000,maptype='CHAINING',loadfactor = 4.0)
+    catalog['yearsborn'] = mp.newMap(100000,maptype='PROBING',loadfactor = 0.5)
 
     return catalog
 # Funciones para agregar informacion al catalogo
