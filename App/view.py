@@ -46,6 +46,7 @@ def printMenu():
     print("2- Listar cronológicamente los artistas")
     print("3- Listar cronológicamente las adquisiciones")
     print("4- REQUERIMIENTO 3")
+    print("5- Organizar obras por nacionalidad")
     print("7- SALIR")
 
 
@@ -87,6 +88,36 @@ def ReqUno(catalog, inicial, final):
         x.add_row([artista["ConstituentID"], artista["DisplayName"], artista["BeginDate"],
                    artista["Nationality"], artista["Gender"], artista["ArtistBio"], 
                    artista["Wiki QID"], artista["ULAN"]])
+    print(x)
+
+def ReqDos(catalog, inicial, final):
+    resultado = controller.ReqDos(catalog, inicial, final)
+    data = resultado[0]
+    tamanio = lt.size(data)
+    purch = resultado[1]
+    print("============= Req No. 2 Inputs =============")
+    print("Artworks acquired between" + str(inicial) + " and " + str(final) + "\n")
+    print("============= Req No. 2 Answer =============")
+    print("The MoMA aqcuired " + str(tamanio) + "  unique pieces between " + str(inicial) + " and " + str(final) + "\n")
+    print("Purchased " + str(purch) + " of them \n")
+    print("The first and last 3 artists in range are")
+    x = PrettyTable()
+    x.field_names = (["ObjectID","Title","ArtistNames","Medium","Dimensions","Date","DateAcquired","URL"])
+    x.max_width = 25
+    x.hrules=ALL
+
+    for i in range(1, 4):
+        obra = lt.getElement(data, i)
+        
+        x.add_row([obra["ObjectID"], obra["Title"], obra["ConstituentID"],
+                   obra["Medium"], obra["Dimensions"], obra["Date"], 
+                   obra["DateAcquired"], obra["URL"]])
+    for i in range((lt.size(data)-2), lt.size(data)+1):
+        obra = lt.getElement(data, i)
+        
+        x.add_row([obra["ObjectID"], obra["Title"], obra["ConstituentID"],
+                   obra["Medium"], obra["Dimensions"], obra["Date"], 
+                   obra["DateAcquired"], obra["URL"]])
     print(x)
 
 def funcionReqTres(catalog, nombre):
@@ -148,6 +179,46 @@ def funcionReqTres(catalog, nombre):
         print(y)
 
 
+def ReqCuatro(catalog):
+    data = controller.ReqCuatro(catalog)
+
+    print("============= Req No. 4 Inputs =============")
+    print("Ranking countries by their number of artworks in the MoMA... \n")
+    print("============= Req No. 4 Answer =============")
+    print("The TOP 10 countries in the MoMA are:")
+    
+    x = PrettyTable()
+    x.field_names = (["Nationality", "ArtWorks"])
+    x.hrules= ALL
+
+    for i in range(1, 11):
+        ele = lt.getElement(data, i)
+        x.add_row([ele["Nationality"], ele["size"]])
+
+    print(x)
+
+    top = lt.getElement(data, 1)
+
+    print("The TOP nationality in the museum is: " + str(top["Nationality"]) + " with " + str(top["size"]) + " pieces")
+    x = PrettyTable()
+    x.field_names = (["ObjectID","Title","ArtistNames","Medium","Date","Dimensions","Department", "Classification", "URL"])
+    x.max_width = 25
+    x.hrules=ALL
+
+    for i in range(1, 4):
+        obra = lt.getElement(top["Artworks"], i)
+        
+        x.add_row([obra["ObjectID"], obra["Title"], obra["ConstituentID"],
+                   obra["Medium"], obra["Date"], obra["Dimensions"], 
+                   obra["Department"], obra["Classification"], obra["URL"]])
+    for i in range((lt.size(top["Artworks"])-2), lt.size(top["Artworks"])+1):
+        obra = lt.getElement(top["Artworks"], i)
+        
+        x.add_row([obra["ObjectID"], obra["Title"], obra["ConstituentID"],
+                   obra["Medium"], obra["Date"], obra["Dimensions"], 
+                   obra["Department"], obra["Classification"], obra["URL"]])
+    print(x)
+
 #def ReqLab6(catalog, nacionalidad):
     #size = controller.ReqLab6(catalog, nacionalidad)
     #print("============= Req Lab. 6 Inputs =============")
@@ -183,6 +254,14 @@ while True:
         t1 = process_time()
         print("Time = " + str(t2 - t1) + "seg \n")
 
+    elif int(inputs[0]) == 3:
+        inicial = input("Ingrese el año inicial (AAAA-MM-DD): \n")
+        final = input("Ingrese el año final (AAAA-MM-DD): \n")
+        t1 = process_time()
+        ReqDos(catalog, inicial, final)
+        t2 = process_time()
+        print("Time = " + str(t2 - t1) + "seg \n")
+
     elif int(inputs[0]) == 4:
         elnombre = input("Ingrese el nombre del artista: \n")
         t1 = process_time()
@@ -190,6 +269,11 @@ while True:
         t1 = process_time()
         print("Time = " + str(t2 - t1) + "seg \n")
 
+    elif int(inputs[0]) == 5:
+        t1 = process_time()
+        ReqCuatro(catalog)
+        t2 = process_time()
+        print("Time = " + str(t2 - t1) + "seg \n")
     else:
         sys.exit(0)
 sys.exit(0)

@@ -55,7 +55,7 @@ def loadArtists(catalog):
     cada uno de ellos, se crea en la lista de autores, a dicho autor y una
     referencia al libro que se esta procesando.
     """
-    artistsfile = cf.data_dir + 'MoMA/Artists-utf8-large.csv'
+    artistsfile = cf.data_dir + 'MoMA/Artists-utf8-small.csv'
     input_file = csv.DictReader(open(artistsfile, encoding='utf-8'))
     for artist in input_file:
         model.addArtists(catalog, artist)
@@ -68,20 +68,20 @@ def loadArtworks(catalog):
     """
     Carga todos los tags del archivo y los agrega a la lista de tags
     """
-    artworksfile = cf.data_dir + 'MoMA/Artworks-utf8-large.csv'
+    artworksfile = cf.data_dir + 'MoMA/Artworks-utf8-small.csv'
     input_file = csv.DictReader(open(artworksfile, encoding='utf-8'))
     for work in input_file:
         model.addArtworks(catalog, work)
-
-
-def funcionReqUno(catalog,medium):
-    return model.funcionReqUno(catalog,medium)
+        model.adquisicion(catalog, work)
 
 def funcionReqUnoReto(catalog, inicial, final):
     return model.funcionReqUnoReto(catalog, inicial, final)
 
-def ReqLab6(catalog, nacionalidad):
-    return model.ReqLab6(catalog, nacionalidad)
+def ReqDos(catalog, inicial, final):
+    return model.ReqDos(catalog, inicial, final)
 
 def funcionReqTres(catalog, nombre):
     return model.funcionReqTres(catalog, nombre)
+        
+def  ReqCuatro(catalog):
+    return model.ReqCuatro(catalog)
