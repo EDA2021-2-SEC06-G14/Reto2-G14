@@ -43,10 +43,10 @@ operación solicitada
 def printMenu():
     print("Bienvenido")
     print("1- Cargar información en el catálogo")
-    print("2- Las N obras mas antiguas del medio")
-    print("3- Numero de obras de una nacionalidad")
-    print("4- Listar cronológicamente los artistas")
-    print("5- SALIR")
+    print("2- Listar cronológicamente los artistas")
+    print("3- Listar cronológicamente las adquisiciones")
+    print("4- REQUERIMIENTO 3")
+    print("7- SALIR")
 
 
 def initCatalogA():
@@ -61,49 +61,6 @@ def loadData(catalog):
     Carga los libros en la estructura de datos
     """
     controller.loadData(catalog)
-
-def funcionReqLabFive(catalog, medium,eln):
-    ordenad= controller.funcionReqUno(catalog,medium)
-    ordenado = ordenad["obras"]
-    el_n= int(eln)
-    tamanio = lt.size(ordenado)
-    print("============= Req Lab. 5 Inputs =============")
-    print("Artworks of the medium " + str(medium) + "\n")
-    print("============= Req Lab. 5 Answer =============")
-    print("There are " + str(tamanio) + " artworks of the medium " + str(medium)  + "\n")
-    print("The n works are")
-    if ordenado==None:
-        print("No hay info")
-    elif tamanio<el_n:
-        x = PrettyTable()
-        x.field_names = (["ObjectID","Title", "Medium", "Dimensions","Date",
-                      "DateAcquired", "URL"])
-        x.max_width = 25
-        x.hrules=ALL
-
-        for i in range(0, tamanio+1):
-            artwork = lt.getElement(ordenado, i)
-            
-            x.add_row([artwork["ObjectID"], artwork["Title"],
-                    artwork["Medium"], artwork["Dimensions"],artwork["Date"], artwork["DateAcquired"], 
-                    artwork["URL"]])
-        print(x)
-
-    else:
-        x = PrettyTable()
-        x.field_names = (["ObjectID","Title", "Medium", "Dimensions","Date",
-                      "DateAcquired", "URL"])
-        x.max_width = 25
-        x.hrules=ALL
-
-        for i in range(1, el_n):
-            artwork = lt.getElement(ordenado, i)
-            
-            x.add_row([artwork["ObjectID"], artwork["Title"], 
-                    artwork["Medium"], artwork["Dimensions"], artwork["Date"],artwork["DateAcquired"], 
-                    artwork["URL"]])
-
-        print(x)
 
 def ReqUno(catalog, inicial, final):
     ordenado= controller.funcionReqUnoReto(catalog,inicial,final)
@@ -132,13 +89,71 @@ def ReqUno(catalog, inicial, final):
                    artista["Wiki QID"], artista["ULAN"]])
     print(x)
 
+def funcionReqTres(catalog, nombre):
+    tad_medios,tad_obras,contador = controller.funcionReqTres(catalog, nombre)
+    if tad_medios=="NOHAYOBRAS":
+        print("THERE ARE NO WORKS BY THAT AUTHOR")
+    elif tad_medios=="NOHAYAUTOR":
+        print("THE AUTHOR IS NOT REGISTERED IN THE DATA BASE")
+    else:
+        size = lt.size(tad_medios)
+        sizes = mp.size(tad_obras)
+        primer = lt.getElement(tad_medios,1)
+        coso = mp.get(tad_obras, primer['Medium'])
+        coso = me.getValue(coso)
+        paraid = lt.getElement(coso, 1)
+        const = paraid["ConstituentID"]
+        print("============= Req No. 3 Inputs =============")
+        print("Examine the work of the artist named: " + str(nombre) + "\n")
+        print("============= Req No. 3 Answer =============")
+        print(str(nombre)+ " with MoMA ID " + str(const) + " has " + str(contador) + "pieces in hisher name at the museum \n")
+        print("There are "+ str(size) +"different mediums in his her work")
+        print("Her his top 5 techniques are:")
+        x = PrettyTable()  
+        x.field_names = (["Medium","Count"])
+        x.max_width = 25
+        x.hrules=ALL
+        if size >= 5:
+            for i in range(1, 6):
+                medio = lt.getElement(tad_medios, i)
+                x.add_row([medio["Medium"], medio["Cant"]])
+    
+        else:
+            for i in range(1,size+1):
+                medio = lt.getElement(tad_medios, i)
+                x.add_row([medio["Medium"], medio["Cant"]])
+        print(x)
+        lamas = lt.getElement(tad_medios,1)
+        usada = lamas['Medium']
+        numero = lamas['Cant']
+        print("His her most used medium is: " + str(usada) + " with "+ str(numero)+"pieces")
+        y = PrettyTable()
+        y.field_names = (["ObjectID","Title", "Medium", "Dimensions",
+                      "DateAcquired", "Classification", "URL"])
+        y.max_width = 25
+        y.hrules=ALL
+        if lt.size(coso) >= 3:
+            for i in range(1, 4):
+                artwork = lt.getElement(coso, i)
+            
+                y.add_row([artwork["ObjectID"], artwork["Title"], 
+                        artwork["Medium"], artwork["Dimensions"], artwork["DateAcquired"],artwork["Classification"], 
+                        artwork["URL"]])
+        else:
+            for i in range(1,lt.size(coso)+1):
+                artwork = lt.getElement(coso, i)
+                y.add_row([artwork["ObjectID"], artwork["Title"], 
+                        artwork["Medium"], artwork["Dimensions"], artwork["DateAcquired"],artwork["Classification"], 
+                        artwork["URL"]])
+        print(y)
 
-def ReqLab6(catalog, nacionalidad):
-    size = controller.ReqLab6(catalog, nacionalidad)
-    print("============= Req Lab. 6 Inputs =============")
-    print("Artworks of the nationality " + nacionalidad + "\n")
-    print("============= Req Lab. 6 Answer =============")
-    print("There are " + str(size) + " artworks of the nationality " + nacionalidad  + "\n")
+
+#def ReqLab6(catalog, nacionalidad):
+    #size = controller.ReqLab6(catalog, nacionalidad)
+    #print("============= Req Lab. 6 Inputs =============")
+    #print("Artworks of the nationality " + nacionalidad + "\n")
+    #print("============= Req Lab. 6 Answer =============")
+    #print("There are " + str(size) + " artworks of the nationality " + nacionalidad  + "\n")
 
 
 """
@@ -156,30 +171,22 @@ while True:
         #Nationality
         print('Artistas cargados: ' + str(lt.size(catalog['Artists'])) + "\n")
         print('Obras cargadas: ' + str(lt.size(catalog['Artworks']))+"\n")
-        print('Medios cargados: ' + str(mp.size(catalog['Mediums']))+"\n")
-        print('Nacionalidades cargadas: ' + str(mp.size(catalog['Nationality']))+"\n")
-        print("Time = " + str(t2 - t1) + "seg \n")
-    
-    elif int(inputs[0]) == 2:
-        medio=input("Coloque el medio:\n")
-        eln=input("Cuantas obras quiere ver:\n")
-        t1 = process_time()
-        funcionReqLabFive(catalog, medio, eln)
-        t2 = process_time()
-        print("Time = " + str(t2 - t1) + "seg \n")
-
-    elif int(inputs[0]) == 3:
-        nacionalidad = input("Ingrese la nacionalidad: \n")
-        t1 = process_time()
-        size = ReqLab6(catalog, nacionalidad)
-        t1 = process_time()
+        #print('Medios cargados: ' + str(mp.size(catalog['Mediums']))+"\n")
+        #print('Nacionalidades cargadas: ' + str(mp.size(catalog['Nationality']))+"\n")
         print("Time = " + str(t2 - t1) + "seg \n")
         
-    elif int(inputs[0]) == 4:
+    elif int(inputs[0]) == 2:
         inicial = input("Ingrese el año inicial: \n")
         final = input("Ingrese el año final: \n")
         t1 = process_time()
         ReqUno(catalog, inicial, final)
+        t1 = process_time()
+        print("Time = " + str(t2 - t1) + "seg \n")
+
+    elif int(inputs[0]) == 4:
+        elnombre = input("Ingrese el nombre del artista: \n")
+        t1 = process_time()
+        funcionReqTres(catalog, elnombre)
         t1 = process_time()
         print("Time = " + str(t2 - t1) + "seg \n")
 
