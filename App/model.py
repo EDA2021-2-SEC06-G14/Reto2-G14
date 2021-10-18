@@ -29,6 +29,8 @@ from DISClib.ADT import list as lt
 from DISClib.ADT import map as mp
 from DISClib.DataStructures import mapentry as me
 from DISClib.Algorithms.Sorting import mergesort as sa
+from DISClib.DataStructures.probehashtable import contains
+from DISClib.DataStructures.singlelinkedlist import addLast
 import config as cf
 assert cf
 
@@ -64,6 +66,10 @@ def newCatalogA():
                                        loadfactor = 0.5)
 
     catalog['yearsborn'] = mp.newMap(100000,maptype='PROBING',loadfactor = 0.5)
+
+    catalog["DateAcquired"] = mp.newMap(10000, 
+                                        maptype= 'PROBING', 
+                                        loadfactor = 0.5)
 
     return catalog
 # Funciones para agregar informacion al catalogo
@@ -144,7 +150,7 @@ def newMedium(pubmedium):
 def addArtistConstituent(catalog, artist):
 
     artistas = catalog['ArtistConstituent']    
-    arti = mp.put(artistas, artist["ConstituentID"], artist)
+    mp.put(artistas, artist["ConstituentID"], artist)
 
 def addNationality(catalog, obra):
 
@@ -156,6 +162,15 @@ def addNationality(catalog, obra):
         nat = mp.get(catalog["ArtistConstituent"], i)
         nat = me.getValue(nat)
         nat = nat["Nationality"]
+
+        autores = "-"
+        for j in artistas:
+            art = mp.get(catalog["ArtistConstituent"], j)
+            art = me.getValue(art)["DisplayName"]
+
+            autores = autores + art + "-"
+
+        obra["ConstituentID"] = autores
 
         if nat.lower() in (None, "", "unknown", "nationality unknown"):
             nat = "Unknown"
@@ -206,6 +221,25 @@ def newYear(bornyear):
     entry['artists'] = lt.newList('ARRAY_LIST')
     return entry
 
+def adquisicion(catalog, obra):
+
+    mapa = catalog["DateAcquired"]
+    fecha = obra["DateAcquired"][0:4]
+    
+    if fecha == None:
+        fecha = 0
+
+    existe = contains(mapa, fecha)
+    if existe:
+        list = mp.get(mapa, fecha)
+        li = me.getValue(list)
+    else:
+        li = lt.newList("ARRAY_LIST")
+        mp.put(mapa, fecha, li)
+
+    lt.addLast(li, obra)
+
+
 def funcionReqUno(catalog, medium):
     """
     Retorna un autor con sus libros a partir del nombre del autor
@@ -240,6 +274,83 @@ def funcionReqUnoReto(catalog, inicial, final):
     return tad_rta
 
 
+def ReqDos(catalog, inicial, final):
+    ini = int(inicial[0:4])
+    fin = int(final[0:4])
+    data = lt.newList("ARRAY_LIST")
+    purhcased = 0
+
+    for i in range(ini, fin+1):
+
+        if i == ini or i == fin:
+            anio = mp.get(catalog["DateAcquired"], str(i))
+            if anio:
+                anio = me.getValue(anio)
+                for x in range(1, lt.size(anio)+1):
+                    ele = lt.getElement(anio, x)
+
+                    if ele["DateAcquired"] >= inicial and ele["DateAcquired"] <= final:
+
+                        if "purchase" in ele["CreditLine"].lower():
+                            purhcased += 1 
+
+                        autores = "-"
+                        au = ele["ConstituentID"].replace("[", "").replace("]", "").replace(" ", "").split(",")
+                        for a in au:
+                            art = mp.get(catalog["ArtistConstituent"], a)
+                            if art:
+                                arti = me.getValue(art)
+                                autores = autores + arti["DisplayName"] + "-"
+
+                        ele["ConstituentID"] = autores
+                        lt.addLast(data, ele)
+        else:
+            anio = mp.get(catalog["DateAcquired"], str(i))
+            if anio:
+                obras = me.getValue(anio)
+                for j in range(1, lt.size(obras)+1):
+                    ele = lt.getElement(obras, j)
+
+                    if "purchase" in ele["CreditLine"].lower():
+                        purhcased += 1 
+
+                    autores = "-"
+                    au = ele["ConstituentID"].replace("[", "").replace("]", "").replace(" ", "").split(",")
+                    for a in au:
+                        art = mp.get(catalog["ArtistConstituent"], a)
+                        if art:
+                            arti = me.getValue(art)
+                            autores = autores + arti["DisplayName"] + "-"
+                    ele["ConstituentID"] = autores
+                    lt.addLast(data, ele)
+
+    data = sa.sort(data, cmpdateadquired)
+
+    return [data, purhcased]
+
+
+def ReqCuatro(catalog):
+
+    nationality = catalog["Nationality"]
+
+    keys = mp.keySet(nationality)
+    keys = lt.iterator(keys)
+    data = lt.newList("ARRAY_LIST")
+
+    for i in keys:
+        elem = mp.get(nationality, i)
+        elem = me.getValue(elem)
+        size = lt.size(elem)
+
+        nat = {"Nationality": i,
+               "size": size,
+               "Artworks": elem}
+
+        lt.addLast(data, nat)
+
+    return sa.sort(data, cmpsize)
+
+
 def cmpFunctionRuno(anouno, anodos):
     return (int(anouno["BeginDate"]) < int(anodos["BeginDate"]))
 
@@ -272,7 +383,7 @@ def cmpnationality(nat1, nat2):
     return nat1["Nationality"] < nat2["Nationality"]
 
 def cmpsize(obras1, obras2):
-    return int(lt.size(obras1["obras"])) > int(lt.size(obras2["obras"]))
+    return int(obras1["size"]) > int(obras2["size"])
 
 def compareObjectID(artwork1, artwor2):
     if (artwork1["ObjectID"] == artwor2['ObjectID']):
@@ -319,3 +430,7 @@ def compareMapMediums(med, entry):
         return 1
     else:
         return -1
+
+
+def cmpdateadquired(obras1, obras2):
+    return int(obras1["DateAcquired"].replace("-", "")) < int(obras2["DateAcquired"].replace("-", ""))
