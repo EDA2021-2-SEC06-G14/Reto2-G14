@@ -42,13 +42,13 @@ def newCatalogA():
     generos y libros. Retorna el catalogo inicializado.
     """
     catalog = {'Artists': None,
-               'Artworks': None,
+               'Artworks': 0,
                'Mediums':None,
                'ArtistConstituent': None,
                'Nationality': None}
 
     #catalog['Artists'] = lt.newList('ARRAY_LIST', cmpfunction = compareArtistID)
-    catalog['Artworks'] = lt.newList('ARRAY_LIST', cmpfunction =  compareObjectID)
+    #catalog['Artworks'] = lt.newList('ARRAY_LIST', cmpfunction =  compareObjectID)
 
     #catalog['Mediums'] = mp.newMap(100000,
                                    #maptype='PROBING',
@@ -110,7 +110,7 @@ def addArtworks(catalog, artwork):
         'Date':artwork['Date']
 
     }
-    lt.addLast(catalog['Artworks'], obra)
+    catalog['Artworks']+=1
     addToAuthor(catalog, obra)
     addToDept(catalog,obra)
     addNationality(catalog, obra)

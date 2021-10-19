@@ -45,7 +45,7 @@ def printMenu():
     print("1- Cargar información en el catálogo")
     print("2- Listar cronológicamente los artistas")
     print("3- Listar cronológicamente las adquisiciones")
-    print("4- REQUERIMIENTO 3")
+    print("4- Clasificar obras de un artista por tecnica")
     print("5- Organizar obras por nacionalidad")
     print("6- Transportar obras de un Departamento")
     print("7- SALIR")
@@ -295,7 +295,7 @@ while True:
         print("Cargando información de los archivos ....\n")
         #Nationality
         print('Artistas cargados: ' + str(mp.size(catalog["ArtistConstituent"])) + "\n")
-        print('Obras cargadas: ' + str(lt.size(catalog['Artworks']))+"\n")
+        print('Obras cargadas: ' + str(catalog['Artworks'])+"\n")
         print('Dpst cargados: ' + str(mp.size(catalog['Depts']))+"\n")
         #print('Nacionalidades cargadas: ' + str(mp.size(catalog['Nationality']))+"\n")
         print("Time = " + str(t2 - t1) + "seg \n")
