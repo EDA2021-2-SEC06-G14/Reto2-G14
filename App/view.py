@@ -47,6 +47,7 @@ def printMenu():
     print("3- Listar cronológicamente las adquisiciones")
     print("4- REQUERIMIENTO 3")
     print("5- Organizar obras por nacionalidad")
+    print("6- Transportar obras de un Departamento")
     print("7- SALIR")
 
 
@@ -219,6 +220,59 @@ def ReqCuatro(catalog):
                    obra["Department"], obra["Classification"], obra["URL"]])
     print(x)
 
+def funcionReqCin(catalog, nombre):
+    costo,tad_antiguas,tad_costosas, pesototal = controller.funcionReqCin(catalog, nombre)
+    if lt.size(tad_antiguas)==0:
+        print("THERE ARE NO WORKS BY THAT DEPARTMENT")
+    else:
+        size = lt.size(tad_costosas)
+        sizes = lt.size(tad_antiguas)
+        print("============= Req No. 5 Inputs =============")
+        print("Estimate the cost to transport all artifacts in " + str(nombre) + "MoMA's Department\n")
+        print("============= Req No. 5 Answer =============")
+        print("The MoMA is going to transport " + str(sizes) +"artifacts from: "+str(nombre) +" \n")
+        print("REMEMBER!! NOT all MoMA's data is complete!!!...These are estimates")
+        print("Estimated Cargo Weight:"+str(pesototal))
+        print("Estimated cargo cost:"+str(costo))
+        print("The TOP 5 most expensive items to transport are: ")
+        x = PrettyTable()  
+        x.field_names = (["ObjectID","Title", "ArtistsNames", "Medium", "Date", "Dimensions", "Classification", "TransCost (USD)", "URL"])
+        x.max_width = 25
+        x.hrules=ALL
+        if size >= 5:
+            for i in range(1, 6):
+                artwork = lt.getElement(tad_costosas, i)
+                x.add_row([artwork["ObjectID"], artwork["Title"], artwork['Artists'], 
+                        artwork["Medium"], artwork['Date'], artwork["Dimensions"],artwork["Classification"], 
+                        artwork['TransCost (USD)'], artwork["URL"]])
+    
+        else:
+            for i in range(1,size+1):
+                artwork = lt.getElement(tad_costosas, i)
+                x.add_row([artwork["ObjectID"], artwork["Title"], artwork['Artists'], 
+                        artwork["Medium"], artwork['Date'], artwork["Dimensions"],artwork["Classification"], 
+                        artwork['TransCost (USD)'], artwork["URL"]])
+        print(x)
+        print("The TOP 5 oldest items to transport are: ")
+        y = PrettyTable()  
+        y.field_names = (["ObjectID","Title", "ArtistsNames", "Medium", "Date", "Dimensions", "Classification", "TransCost (USD)", "URL"])
+        y.max_width = 25
+        y.hrules=ALL
+        if size >= 5:
+            for i in range(1, 6):
+                artwork = lt.getElement(tad_antiguas, i)
+                y.add_row([artwork["ObjectID"], artwork["Title"], artwork['Artists'], 
+                        artwork["Medium"], artwork['Date'], artwork["Dimensions"],artwork["Classification"], 
+                        artwork['TransCost (USD)'], artwork["URL"]])
+    
+        else:
+            for i in range(1,size+1):
+                artwork = lt.getElement(tad_antiguas, i)
+                y.add_row([artwork["ObjectID"], artwork["Title"], artwork['Artists'], 
+                        artwork["Medium"], artwork['Date'], artwork["Dimensions"],artwork["Classification"], 
+                        artwork['TransCost (USD)'], artwork["URL"]])
+        print(y)
+
 #def ReqLab6(catalog, nacionalidad):
     #size = controller.ReqLab6(catalog, nacionalidad)
     #print("============= Req Lab. 6 Inputs =============")
@@ -242,7 +296,7 @@ while True:
         #Nationality
         print('Artistas cargados: ' + str(lt.size(catalog['Artists'])) + "\n")
         print('Obras cargadas: ' + str(lt.size(catalog['Artworks']))+"\n")
-        #print('Medios cargados: ' + str(mp.size(catalog['Mediums']))+"\n")
+        print('Dpst cargados: ' + str(mp.size(catalog['Depts']))+"\n")
         #print('Nacionalidades cargadas: ' + str(mp.size(catalog['Nationality']))+"\n")
         print("Time = " + str(t2 - t1) + "seg \n")
         
@@ -266,12 +320,18 @@ while True:
         elnombre = input("Ingrese el nombre del artista: \n")
         t1 = process_time()
         funcionReqTres(catalog, elnombre)
-        t1 = process_time()
+        t2 = process_time()
         print("Time = " + str(t2 - t1) + "seg \n")
 
     elif int(inputs[0]) == 5:
         t1 = process_time()
         ReqCuatro(catalog)
+        t2 = process_time()
+        print("Time = " + str(t2 - t1) + "seg \n")
+    elif int(inputs[0]) == 6:
+        elnombre = input("Ingrese el nombre del dept: \n")
+        t1 = process_time()
+        funcionReqCin(catalog, elnombre)
         t2 = process_time()
         print("Time = " + str(t2 - t1) + "seg \n")
     else:

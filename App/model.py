@@ -55,21 +55,23 @@ def newCatalogA():
                                    #loadfactor=0.5,
                                    #comparefunction=compareMapMediums)
 
-    catalog['ArtistConstituent'] =  mp.newMap(50000,
+    catalog['ArtistConstituent'] =  mp.newMap(4000,
                                               maptype = "PROBING",
                                               loadfactor = 0.5)
             
-    catalog['ArtistConsti'] = mp.newMap(50000,maptype = "PROBING",loadfactor = 0.5)
+    catalog['ArtistConsti'] = mp.newMap(4000,maptype = "PROBING",loadfactor = 0.5)
 
     catalog['Nationality'] = mp.newMap(1000,
                                        maptype='PROBING',
                                        loadfactor = 0.5)
 
-    catalog['yearsborn'] = mp.newMap(20000,maptype='PROBING',loadfactor = 0.5)
+    catalog['yearsborn'] = mp.newMap(2000,maptype='PROBING',loadfactor = 0.5)
+    catalog['Depts'] = mp.newMap(2000,maptype='PROBING',loadfactor = 0.5)
 
     catalog["DateAcquired"] = mp.newMap(10000, 
                                         maptype= 'PROBING', 
                                         loadfactor = 0.5)
+
 
 
     return catalog
@@ -110,7 +112,9 @@ def addArtworks(catalog, artwork):
     }
     lt.addLast(catalog['Artworks'], obra)
     addToAuthor(catalog, obra)
+    addToDept(catalog,obra)
     addNationality(catalog, obra)
+    
 
 
 def addArtistConstituent(catalog, artist):
@@ -249,6 +253,102 @@ def adquisicion(catalog, obra):
         mp.put(mapa, fecha, li)
 
     lt.addLast(li, obra)
+def addToDept(catalog, obra):
+    departamento = obra['Department']
+    depts = catalog["Depts"]
+    if departamento.lower() in (None, "", "unknown"):
+        departamento= "unknown"
+    existe = mp.contains(depts,departamento)
+    if existe:
+        parja= mp.get(depts,departamento)
+        listica = me.getValue(parja)
+    else:
+        listica=lt.newList("ARRAY_LIST")
+        mp.put(depts,departamento,listica)
+    lt.addLast(listica, obra)
+
+def funcionReqCin(catalog, nombre):
+    la_lista=mp.get(catalog["Depts"],nombre)
+    la_lista=me.getValue(la_lista)
+    cant=lt.size(la_lista)
+    costoretotal=0.0
+    pesototal=0.0
+    cant+=1
+    antiguas = lt.newList("ARRAY_LIST")
+    costosas = lt.newList("ARRAY_LIST")
+    for i in range(1, cant):
+        costototal=0.0
+        ele = lt.getElement(la_lista,i)
+        costopeso=0
+        if (ele["Weight (kg)"]==None) or (ele["Weight (kg)"]==''):
+            costopeso=float(-1)
+        else:
+            costopeso = float(ele["Weight (kg)"])*72
+            pesototal+= float(ele["Weight (kg)"])
+        costomedidas=-1
+        if (ele["Height (cm)"]!=None) and (ele["Height (cm)"]!=''):
+            if (ele["Width (cm)"]!=None) and (ele["Width (cm)"]!=''):
+                if (ele['Depth (cm)']!=None) and (ele['Depth (cm)']!=''):
+                    if float(ele['Depth (cm)'])>0:
+                        depth= float(ele['Depth (cm)'])/100
+                        width = float(ele["Width (cm)"])/100
+                        height = float(ele["Height (cm)"])/100
+                        m3= depth*width*height
+                        costomedidas=m3*72
+                    else:
+                        width = float(ele["Width (cm)"])/100
+                        height = float(ele["Height (cm)"])/100
+                        m2= width*height
+                        costomedidas=m2*72
+                else:
+                    width = float(ele["Width (cm)"])/100
+                    height = float(ele["Height (cm)"])/100
+                    m2= width*height
+                    costomedidas=m2*72
+            elif (ele["Diameter (cm)"]!=None) and (ele["Diameter (cm)"]!=''):
+                radio = float(ele["Diameter (cm)"])/200
+                height = float(ele["Height (cm)"])/100
+                m3= radio*height*radio*math.pi
+                costomedidas=m3*72
+        elif (ele["Width (cm)"]!=None) and (ele["Width (cm)"]!=''):
+            if (ele['Length (cm)']!=None) and (ele['Length (cm)']!=''):
+                width = float(ele["Width (cm)"])/100
+                lenght = float(ele["Length (cm)"])/100
+                m2=width*lenght
+                costomedidas=m2*72
+        elif (ele["Diameter (cm)"]!=None) and (ele["Diameter (cm)"]!=''):
+            radio = float(ele["Diameter (cm)"])/200
+            m2= radio*radio*math.pi
+            costomedidas=m2*72
+        costototal=max(costopeso,costomedidas)
+        if costototal<=0:
+            costototal=48.0
+        authors = ele["ConstituentID"].strip("[]").replace(" ", "").split(",")
+        for x in authors:
+            elemento= mp.get(catalog["ArtistConstituent"],x)
+            if elemento!=None:
+                elemento= me.getValue(elemento)
+                autores = autores +"-"+ elemento['DisplayName'] + "-"
+        agregar = {
+            'ObjectID':ele['ObjectID'],
+            'Title':ele['Title'],
+            'Artists':ele["ConstituentID"],
+            'Medium':ele['Medium'],
+            'Dimensions':ele['Dimensions'],
+            'DateAcquired':ele['DateAcquired'],
+            'Classification':ele['Classification'],
+            'TransCost (USD)':str(costototal),
+            'URL':ele['URL'],
+            'Date':ele['Date']
+        }
+        lt.addLast(antiguas,agregar)
+        lt.addLast(costosas,agregar)
+        costoretotal+=costototal
+    #AQUI SE SUPONE QUE YA TENEMOS LAS 2 LISTICAS LISTAS:)
+    ordenantiguas = merge.sort(antiguas,cmpdate)
+    ordencostosas = merge.sort(costosas,cmpcost)
+    tuplatriple = costoretotal,ordenantiguas,ordencostosas,pesototal
+    return tuplatriple
 
 def funcionReqUnoReto(catalog, inicial, final):
     ini = int(float(inicial))
