@@ -47,7 +47,7 @@ def newCatalogA():
                'ArtistConstituent': None,
                'Nationality': None}
 
-    catalog['Artists'] = lt.newList('ARRAY_LIST', cmpfunction = compareArtistID)
+    #catalog['Artists'] = lt.newList('ARRAY_LIST', cmpfunction = compareArtistID)
     catalog['Artworks'] = lt.newList('ARRAY_LIST', cmpfunction =  compareObjectID)
 
     #catalog['Mediums'] = mp.newMap(100000,
@@ -55,20 +55,20 @@ def newCatalogA():
                                    #loadfactor=0.5,
                                    #comparefunction=compareMapMediums)
 
-    catalog['ArtistConstituent'] =  mp.newMap(4000,
+    catalog['ArtistConstituent'] =  mp.newMap(40000,
                                               maptype = "PROBING",
                                               loadfactor = 0.5)
             
-    catalog['ArtistConsti'] = mp.newMap(4000,maptype = "PROBING",loadfactor = 0.5)
+    catalog['ArtistConsti'] = mp.newMap(40000,maptype = "PROBING",loadfactor = 0.5)
 
     catalog['Nationality'] = mp.newMap(1000,
                                        maptype='PROBING',
                                        loadfactor = 0.5)
 
-    catalog['yearsborn'] = mp.newMap(2000,maptype='PROBING',loadfactor = 0.5)
+    catalog['yearsborn'] = mp.newMap(4000,maptype='PROBING',loadfactor = 0.5)
     catalog['Depts'] = mp.newMap(2000,maptype='PROBING',loadfactor = 0.5)
 
-    catalog["DateAcquired"] = mp.newMap(10000, 
+    catalog["DateAcquired"] = mp.newMap(150000, 
                                         maptype= 'PROBING', 
                                         loadfactor = 0.5)
 
@@ -77,9 +77,9 @@ def newCatalogA():
     return catalog
 # Funciones para agregar informacion al catalogo
 
-def addArtists(catalog, artist):
+#def addArtists(catalog, artist):
     # Se adiciona el libro a la lista de libros
-    lt.addLast(catalog['Artists'], artist)
+    #lt.addLast(catalog['Artists'], artist)
     # Se obtienen los autores del libro
     # ID = artist['Constituent ID']
 

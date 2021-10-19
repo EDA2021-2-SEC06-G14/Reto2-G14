@@ -294,7 +294,7 @@ while True:
         t2 = process_time()
         print("Cargando información de los archivos ....\n")
         #Nationality
-        print('Artistas cargados: ' + str(lt.size(catalog['Artists'])) + "\n")
+        print('Artistas cargados: ' + str(mp.size(catalog["ArtistConstituent"])) + "\n")
         print('Obras cargadas: ' + str(lt.size(catalog['Artworks']))+"\n")
         print('Dpst cargados: ' + str(mp.size(catalog['Depts']))+"\n")
         #print('Nacionalidades cargadas: ' + str(mp.size(catalog['Nationality']))+"\n")
