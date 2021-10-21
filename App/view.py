@@ -305,7 +305,7 @@ while True:
         final = input("Ingrese el año final: \n")
         t1 = process_time()
         ReqUno(catalog, inicial, final)
-        t1 = process_time()
+        t2 = process_time()
         print("Time = " + str(t2 - t1) + "seg \n")
 
     elif int(inputs[0]) == 3:

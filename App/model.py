@@ -41,11 +41,13 @@ def newCatalogA():
     una lista vacia para los generos y una lista vacia para la asociación
     generos y libros. Retorna el catalogo inicializado.
     """
-    catalog = {'Artists': None,
-               'Artworks': 0,
-               'Mediums':None,
+    catalog = {'Artworks': 0,
                'ArtistConstituent': None,
-               'Nationality': None}
+               'ArtistConsti': None,
+               'Nationality': None,
+               'yearsborn': None, 
+               'Depts' : None,
+               'DateAcquired': None}
 
     #catalog['Artists'] = lt.newList('ARRAY_LIST', cmpfunction = compareArtistID)
     #catalog['Artworks'] = lt.newList('ARRAY_LIST', cmpfunction =  compareObjectID)
@@ -68,24 +70,15 @@ def newCatalogA():
     catalog['yearsborn'] = mp.newMap(4000,maptype='PROBING',loadfactor = 0.5)
     catalog['Depts'] = mp.newMap(2000,maptype='PROBING',loadfactor = 0.5)
 
-    catalog["DateAcquired"] = mp.newMap(150000, 
+    catalog["DateAcquired"] = mp.newMap(4000, 
                                         maptype= 'PROBING', 
                                         loadfactor = 0.5)
 
 
 
     return catalog
-# Funciones para agregar informacion al catalogo
-
-#def addArtists(catalog, artist):
-    # Se adiciona el libro a la lista de libros
-    #lt.addLast(catalog['Artists'], artist)
-    # Se obtienen los autores del libro
-    # ID = artist['Constituent ID']
-
 
 def addArtworks(catalog, artwork):
-    # Se adiciona el libro a la lista de libros
 
     if artwork["Date"] == "":
         artwork["Date"] = "999999"
@@ -253,6 +246,8 @@ def adquisicion(catalog, obra):
         mp.put(mapa, fecha, li)
 
     lt.addLast(li, obra)
+
+    
 def addToDept(catalog, obra):
     departamento = obra['Department']
     depts = catalog["Depts"]
